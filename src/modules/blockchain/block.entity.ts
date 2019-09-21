@@ -13,9 +13,16 @@ export class Block {
    */
   public constructor(block: Partial<Block> = {}) {
     if (block) {
-      for (const key in block) {
+      for (let key in block) {
         if (block[key] != null) {
-          this[key] = block[key];
+          if (key === 'previous_hash') {
+            key = 'previousHash';
+          }
+          if (key === 'transactions') {
+            this[key] = block[key].map(t => new Transaction(t));
+          } else {
+            this[key] = block[key];
+          }
         }
       }
     }

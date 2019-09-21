@@ -53,4 +53,32 @@ export class BlockchainController {
       length: chain.length,
     };
   }
+
+  @Post('nodes')
+  registerNode(@Body() nodes: string[]) {
+    nodes = nodes || [];
+    nodes.forEach(node => {
+      this.blockchainService.registerNode(node);
+    });
+    return {
+      message: 'New nodes have been added.',
+      total_nodes: this.blockchainService.nodes.size,
+    };
+  }
+
+  @Get('nodes/resolve')
+  async consensus() {
+    const replaced = await this.blockchainService.resolveConflicts();
+    const chain = this.blockchainService.chain;
+    if (replaced) {
+      return {
+        message: 'Our chain was replaced',
+        new_chain: chain,
+      };
+    }
+    return {
+      message: 'Our chain is authoritative',
+      chain,
+    };
+  }
 }
